@@ -30,6 +30,8 @@ const alertText = computed(() =>
     : "Your Personal Access Token is not stored.",
 );
 
+const isSetupOpen = ref(false);
+
 function checkPATStorage(): boolean {
   return (isPATStored.value = localStorage.getItem("PAT") !== null);
 }
@@ -40,7 +42,7 @@ function clearPAT() {
 }
 
 async function onSubmit(data: FormSubmitEvent<AuthState>) {
-  const {PAT, savePAT, organization, team, project } = data.data;
+  const { PAT, savePAT, organization, team, project } = data.data;
   if (savePAT) localStorage.setItem("PAT", PAT);
   useState("PAT").value = PAT;
 
@@ -53,94 +55,85 @@ async function onSubmit(data: FormSubmitEvent<AuthState>) {
   localStorage.setItem("team", team);
   useState("team").value = team;
 
-  checkPATStorage();
-  useState("isSetupOpen").value = false;
-}
+  isSetupOpen.value = false;
 
-const isPATModalOpen = computed(
-  () => useState("isSetupOpen", () => false).value,
-);
+  checkPATStorage();
+}
 </script>
 <template>
   <div class="min-h-screen flex flex-col">
-    <UContainer class="flex-1 flex-col flex w-full">
-      <NuxtRouteAnnouncer /><UHeader>
-        <template #logo>
-          <p>DevOps Business Intelligence</p>
-        </template>
-
-        <template #right>
-          <UColorModeButton />
-
-          <UButton
-            @click="useState('isSetupOpen').value = true"
-            icon="i-heroicons-cog-8-tooth"
-            color="gray"
-            variant="ghost"
-          />
-        </template>
-      </UHeader>
-      <NuxtPage />
-      <UModal v-model="isPATModalOpen">
-        <UCard>
-          <template #header>
-            <p>Configuration</p>
+    <div class="flex flex-1 h-full">
+      <UContainer class="flex-1 flex-col flex w-full">
+        <NuxtRouteAnnouncer /><UHeader>
+          <template #logo>
+            <p>DevOps Business Intelligence</p>
           </template>
-          <div class="flex flex-col gap-8">
-            <UAlert
-              :color="isPATStored ? 'red' : 'green'"
-              variant="outline"
-              :icon="
-                isPATStored
-                  ? 'i-heroicons-exclamation-triangle'
-                  : 'i-heroicons-shield-check'
-              "
-              :actions="
-                isPATStored
-                  ? [{ label: 'Clear local storage', click: clearPAT }]
-                  : []
-              "
-              :title="alertText"
-            />
-            <UForm :state="state" class="space-y-6" @submit="onSubmit">
-              <UFormGroup label="Organization" name="organization">
-                <UInput
-                  v-model="state.organization"
-                  type="text"
-                />
-              </UFormGroup>
-              <UFormGroup label="Project" name="project">
-                <UInput
-                  v-model="state.project"
-                  type="text"
-                />
-              </UFormGroup>
-              <UFormGroup label="Team" name="team">
-                <UInput
-                  v-model="state.team"
-                  type="text"
-                />
-              </UFormGroup>
-              <UFormGroup label="Personal Access Token (PAT)" name="pat">
-                <UInput
-                  v-model="state.PAT"
-                  type="password"
-                  icon="i-heroicons-key"
-                />
-              </UFormGroup>
-              <UFormGroup label="" name="save-pat">
-                <UCheckbox
-                  label="Save PAT in local storage (insecure)"
-                  v-model="state.savePAT"
-                />
-              </UFormGroup>
 
-              <UButton type="submit"> Save </UButton>
-            </UForm>
-          </div></UCard
-        ></UModal
-      >
-    </UContainer>
+          <template #right>
+            <UColorModeButton />
+
+            <UButton
+              @click="isSetupOpen = true"
+              icon="i-heroicons-cog-8-tooth"
+              color="gray"
+              variant="ghost"
+            />
+          </template>
+        </UHeader>
+        <NuxtPage />
+        <UModal v-model="isSetupOpen">
+          <UCard>
+            <template #header>
+              <p>Configuration</p>
+            </template>
+            <div class="flex flex-col gap-8">
+              <UAlert
+                :color="isPATStored ? 'red' : 'green'"
+                variant="outline"
+                :icon="
+                  isPATStored
+                    ? 'i-heroicons-exclamation-triangle'
+                    : 'i-heroicons-shield-check'
+                "
+                :actions="
+                  isPATStored
+                    ? [{ label: 'Clear local storage', click: clearPAT }]
+                    : []
+                "
+                :title="alertText"
+              />
+              <UForm :state="state" class="space-y-6" @submit="onSubmit">
+                <UFormGroup label="Organization" name="organization">
+                  <UInput v-model="state.organization" type="text" />
+                </UFormGroup>
+                <UFormGroup label="Project" name="project">
+                  <UInput v-model="state.project" type="text" />
+                </UFormGroup>
+                <UFormGroup label="Team" name="team">
+                  <UInput v-model="state.team" type="text" />
+                </UFormGroup>
+                <UFormGroup label="Personal Access Token (PAT)" name="pat">
+                  <UInput
+                    v-model="state.PAT"
+                    type="password"
+                    icon="i-heroicons-key"
+                  />
+                </UFormGroup>
+                <UFormGroup label="" name="save-pat">
+                  <UCheckbox
+                    label="Save PAT in local storage (insecure)"
+                    v-model="state.savePAT"
+                  />
+                </UFormGroup>
+
+                <UButton type="submit"> Save </UButton>
+              </UForm>
+            </div></UCard
+          ></UModal
+        >
+      </UContainer>
+      <FilterMenu />
+    </div>
 
     <UNotifications />
   </div>
