@@ -80,14 +80,14 @@ const selectedIterations = computed(
   () =>
     iterationsData.value?.value.filter(
       (v) =>
-        (new Date(v.attributes.finishDate).toDateString() >=
-          iterationDates.value.start.toDateString() &&
-          new Date(v.attributes.finishDate).toDateString() <=
-            iterationDates.value.end.toDateString()) ||
-        (new Date(v.attributes.startDate).toDateString() >=
-          iterationDates.value.start.toDateString() &&
-          new Date(v.attributes.startDate).toDateString() <=
-            iterationDates.value.end.toDateString()),
+        (new Date(new Date(v.attributes.finishDate).toDateString()) >=
+          new Date(iterationDates.value.start.toDateString()) &&
+          new Date(new Date(v.attributes.finishDate).toDateString()) <=
+            new Date(iterationDates.value.end.toDateString())) ||
+        (new Date(new Date(v.attributes.startDate).toDateString()) >=
+          new Date(iterationDates.value.start.toDateString()) &&
+          new Date(new Date(v.attributes.startDate).toDateString()) <=
+            new Date(iterationDates.value.end.toDateString())),
     ) ?? [],
 );
 
@@ -160,7 +160,7 @@ watch(selectedIterations, async () => {
               <span>{{ selectedIterations.length }} iterations selected</span>
             </template>
             <template #option="{ option }: { option: TeamSettingsIteration }">
-              <span>{{ option.name }}</span>
+              <span>{{ option.name }} </span>
             </template>
           </USelectMenu>
         </div>
